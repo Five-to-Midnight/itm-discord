@@ -1,0 +1,1572 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InTheMoney — Discord Server Map</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --panel:#161a22;
+      --panel-2:#1b202a;
+      --text:#e7ecf3;
+      --muted:#a7b1c2;
+      --accent:#7aa2f7;
+      --accent-2:#9ece6a;
+      --danger:#f7768e;
+      --warning:#e0af68;
+      --ok:#73daca;
+      --border:#232a36;
+      --chip:#202634;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:14px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: var(--text);
+      background: linear-gradient(120deg, #0f1115 0%, #10131a 60%, #0f1115 100%);
+    }
+    header{
+      position: sticky;
+      top:0;
+      z-index: 20;
+      backdrop-filter: blur(8px);
+      background: rgba(15,17,21,.7);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 24px rgba(0,0,0,.25);
+    }
+    .header-inner{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .title{
+      font-weight: 700;
+      letter-spacing: .3px;
+      font-size: 18px;
+    }
+    .searchbar{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 10px;
+      min-width: 0;
+      width: 420px;
+      max-width: 100%;
+    }
+    .searchbar input{
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      width: 100%;
+    }
+    .controls{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap: wrap;
+    }
+    .btn{
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .15s ease-in-out;
+      font-size: 13px;
+    }
+    .btn:hover{ transform: translateY(-1px); background: var(--panel-2); }
+    .layout{
+      max-width: 1200px;
+      margin: 12px auto 60px;
+      padding: 0 16px 40px;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+    }
+    .left, .right{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .left {
+      padding: 12px;
+      overflow: auto;
+      max-height: calc(100vh - 110px);
+    }
+    .right {
+      padding: 16px;
+      min-height: 420px;
+    }
+    .legend{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .chip{
+      border:1px solid var(--border);
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: var(--chip);
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .accordion{ display: flex; flex-direction: column; gap: 8px; }
+    details.category{
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+    details.category > summary{
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 14px;
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      user-select: none;
+      outline: none;
+    }
+    details.category[open] > summary{ border-bottom: 1px solid var(--border); }
+    .cat-title{ display:flex; gap:8px; align-items:center; }
+    .cat-title .name{ font-weight: 700; }
+    .cat-title .meta{ color: var(--muted); font-size: 12px; }
+    .cat-list{
+      padding: 6px;
+      display: grid;
+      gap: 6px;
+    }
+    .channel{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .channel:hover{ background: #202636; border-color: var(--border); }
+    .channel.selected{ background: #1f2634; border-color: var(--accent); }
+    .ch-left{ display:flex; align-items:center; gap:10px; }
+    .ch-right{ display:flex; gap:6px; flex-wrap: wrap; justify-self: end; }
+    .badge{ font-size: 11px; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--border); background: #151922; color: var(--muted); }
+    .badge.type{ color: var(--accent); border-color: #2a3550; background: #151a25; }
+    .badge.private{ color: #eab308; border-color: #57441c; background: #1a1711; }
+    .badge.public{ color: var(--ok); border-color: #1c4e47; background: #131a1a; }
+    .badge.gated{ color: #c084fc; border-color: #412a59; background: #1a1320; }
+    .badge.optional{ color: #93c5fd; border-color: #294057; background: #121822; }
+    .badge.archived{ color: #cbd5e1; border-color: #334155; background: #0f172a; }
+
+    .details h2{
+      margin: 0 0 8px 0;
+      font-size: 22px;
+      letter-spacing: .2px;
+    }
+    .subtle{ color: var(--muted); font-size: 13px; }
+    .grid{
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .card{
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .card h3{ margin: 0 0 8px 0; font-size: 14px; color: var(--muted); letter-spacing: .3px; text-transform: uppercase; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .kv{ display:grid; grid-template-columns: 120px 1fr; gap: 6px 10px; align-items: start; }
+    .kv span.key{ color: var(--muted); font-size: 12px; }
+    .kv span.val{ font-size: 13px; }
+    .list{ margin: 0; padding-left: 18px; }
+    .muted{ color: var(--muted); }
+    .section{ margin-top: 14px; }
+    .toolbar{ display:flex; gap:8px; margin-top: 10px; flex-wrap: wrap; }
+    .btn.ghost{ background: transparent; border-color: var(--border); }
+    .footer{ margin-top: 16px; display:flex; gap: 10px; align-items:center; color: var(--muted); font-size: 12px; flex-wrap: wrap; }
+    .pill{ background: #1a1f2a; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; }
+
+    /* --- Mobile styles --- */
+    @media (max-width: 900px){
+      .header-inner{ grid-template-columns: 1fr; }
+      .layout{ grid-template-columns: 1fr; margin-bottom: 80px; }
+      .left{ max-height: none; }
+      .grid{ grid-template-columns: 1fr; }
+      .btn{ padding: 8px 10px; font-size: 13px; }
+      .channel{ padding: 12px; }
+    }
+    @media (max-width: 600px){
+      .ch-right{ display: none; } /* keep list compact */
+      .title{ font-size: 16px; }
+      .searchbar{ width: 100%; }
+      .card{ padding: 10px; }
+    }
+
+    /* --- Mobile detail bottom sheet overlay --- */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      z-index: 50;
+    }
+    .overlay.open{ display: block; }
+    .sheet{
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: -100%;
+      background: var(--panel);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,.5);
+      max-height: 85vh;
+      overflow: auto;
+      transition: transform .25s ease-out, bottom .25s ease-out;
+      transform: translateY(0);
+    }
+    .overlay.open .sheet{ bottom: 0; }
+    .sheet-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      z-index:1;
+    }
+    .sheet-title{ font-weight:700; font-size:14px; }
+    .sheet-body{ padding: 12px 14px; }
+    .close-x{
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 10px;
+      color: var(--text);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="title">📋 InTheMoney — Discord Server Map</div>
+      <div class="searchbar" role="search">
+        <span class="muted">🔎</span>
+        <input id="searchInput" type="search" placeholder="Filter channels by name, type, role, or notes…" aria-label="Filter channels" />
+      </div>
+      <div class="controls">
+        <button class="btn" id="expandAll">Expand all</button>
+        <button class="btn" id="collapseAll">Collapse all</button>
+        <button class="btn" id="togglePrivate">Hide private</button>
+        <button class="btn" id="exportMd">Export Markdown</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout" role="main">
+    <aside class="left">
+      <div class="legend" aria-label="Type legend">
+        <span class="chip">💬 Text</span>
+        <span class="chip">🧵 Forum</span>
+        <span class="chip">🖼️ Media</span>
+        <span class="chip">📣 Announcement</span>
+        <span class="chip">🎙️ Stage</span>
+        <span class="chip">🔊 Voice</span>
+        <span class="chip">🔧 Setting</span>
+      </div>
+      <div id="accordion" class="accordion" aria-live="polite"></div>
+    </aside>
+
+    <section class="right" id="detailPanel" aria-live="polite" aria-atomic="true">
+      <div class="details">
+        <h2>Pick a channel</h2>
+        <p class="subtle">Expand a category on the left, then click any channel to see its topic, permissions, gating, tags, and notes.</p>
+        <div class="section">
+          <div class="card">
+            <h3>Role key</h3>
+            <div class="kv">
+              <span class="key">@Admin</span><span class="val">Owner/co‑owners (full control)</span>
+              <span class="key">@Moderator</span><span class="val">Moderation staff</span>
+              <span class="key">@Bot</span><span class="val">Automations and feeds</span>
+              <span class="key">@Verified</span><span class="val">Completed onboarding & accepted rules</span>
+              <span class="key">@Trusted</span><span class="val">Members with a good track record</span>
+              <span class="key">@Options</span><span class="val">Interest role: options</span>
+              <span class="key">@Stocks</span><span class="val">Interest role: stocks</span>
+              <span class="key">@Crypto</span><span class="val">Interest role: crypto</span>
+              <span class="key">@Off‑Topic</span><span class="val">Opt‑in off‑topic access</span>
+              <span class="key">@Historian</span><span class="val">Opt‑in archive access (read‑only)</span>
+              <span class="key">@Event Host</span><span class="val">Hosts for Stages/events</span>
+              <span class="key">@Stage Speaker</span><span class="val">Pre‑approved speakers</span>
+              <span class="key">@Muted</span><span class="val">No send permissions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mobile detail overlay -->
+  <div id="overlay" class="overlay" aria-hidden="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-header">
+        <div class="sheet-title" id="sheetTitle">Channel details</div>
+        <button class="close-x" id="closeSheetBtn" aria-label="Close">Close</button>
+      </div>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+  </div>
+
+  <script>
+  // ---------- Data Model ------------------------------------------------------
+  const DATA = {
+    categories: [
+      {
+        id: "welcome",
+        name: "Welcome & Onboarding",
+        channels: [
+          {
+            id: "server-guide",
+            name: "#server-guide",
+            type: "text",
+            subtype: "resource",
+            privacy: "public-readonly",
+            gatedBy: [],
+            defaultInOnboarding: true,
+            topic: "Welcome from Adam, what this server is about, and 3–5 first steps for new members.",
+            permissions: {
+              view: ["@everyone"],
+              post: [],
+              manage: ["@Admin"]
+            },
+            notes: [
+              "Use Server Guide’s resource page format for a clean, avatar‑free layout.",
+              "Include New Member To‑Do’s: read rules → pick interests → introduce yourself → check resources."
+            ]
+          },
+          {
+            id: "rules",
+            name: "#rules",
+            type: "text",
+            subtype: "resource",
+            privacy: "public-readonly",
+            gatedBy: [],
+            defaultInOnboarding: true,
+            topic: "Up to 16 rules: respect, educational only (no financial advice), no solicitation/pumps, use correct channels, disclose positions if hyping a ticker.",
+            permissions: {
+              view: ["@everyone"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Connect to Rules Screening so members must accept before posting."
+            ]
+          },
+          {
+            id: "introductions",
+            name: "#introductions",
+            type: "text",
+            privacy: "public",
+            gatedBy: [],
+            defaultInOnboarding: true,
+            topic: "Say hi, what markets you trade, timezone. Lightly moderated to keep it welcoming.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Include a pinned template post to make it easy for nervous newcomers.",
+              "Good candidate for a default channel surfaced by Onboarding."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "info",
+        name: "Information & Announcements",
+        channels: [
+          {
+            id: "announcements",
+            name: "#announcements",
+            type: "announcement",
+            privacy: "public",
+            gatedBy: [],
+            defaultInOnboarding: true,
+            topic: "New YouTube videos, major updates, event recaps. Low‑noise, high‑signal.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Admin","@Moderator"],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Use Publish to cross‑post to other servers.",
+              "Be sparing with @everyone to avoid fatigue."
+            ]
+          },
+          {
+            id: "calendar",
+            name: "#calendar-of-events",
+            type: "text",
+            privacy: "public",
+            gatedBy: [],
+            defaultInOnboarding: true,
+            topic: "Upcoming livestreams, AMAs, watch‑alongs, and challenges with reminders.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Admin","@Event Host","@Bot"],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Pair with scheduled Events or a calendar bot to auto‑post reminders."
+            ]
+          },
+          {
+            id: "faq-guides",
+            name: "#faq-and-guides",
+            type: "text",
+            subtype: "resource",
+            privacy: "public-readonly",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "Options basics, risk checklists, broker/platform primers, reading list.",
+            permissions: {
+              view: ["@everyone"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Use Server Guide page format for a tidy resource hub.",
+              "Link to evergreen forum posts instead of duplicating long content."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "live",
+        name: "Trading Floor — Live & Voice",
+        channels: [
+          {
+            id: "live-voice",
+            name: "Live‑Trading Voice",
+            type: "voice",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Open voice during market hours; share screens for quick chart walkthroughs.",
+            permissions: {
+              view: ["@everyone"],
+              connect: ["@Verified"],
+              speak: ["@Verified"],
+              prioritySpeaker: ["@Event Host"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Enable Text Chat in Voice and Go Live (≈50 viewers).",
+              "Use Slowmode on the voice text pane during spikes."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "options",
+        name: "Options",
+        channels: [
+          {
+            id: "options-discussion",
+            name: "#options-discussion",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Options"],
+            defaultInOnboarding: true,
+            topic: "Strategy talk, entries/exits, wins/losses. Keep it friendly and specific.",
+            permissions: {
+              view: ["@Options","@Moderator"],
+              post: ["@Options"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Consider 5–15s Slowmode during volatility."
+            ]
+          },
+          {
+            id: "options-forum",
+            name: "Options Forum",
+            type: "forum",
+            privacy: "private",
+            gatedBy: ["@Options"],
+            defaultInOnboarding: false,
+            topic: "Each post is a self‑contained discussion. Use tags for organization.",
+            permissions: {
+              view: ["@Options","@Moderator"],
+              post: ["@Options"],
+              manage: ["@Moderator"]
+            },
+            tags: ["Spreads","Straddles","Earnings Plays","Risk Mgmt","Newbie Qs"],
+            notes: [
+              "Seed with 3–5 great posts so the structure is obvious.",
+              "Add forum guidelines + default tags."
+            ]
+          },
+          {
+            id: "flow-alerts",
+            name: "#flow-alerts",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Options"],
+            defaultInOnboarding: false,
+            topic: "Read‑mostly unusual options activity feed via a vetted App Directory bot.",
+            permissions: {
+              view: ["@Options","@Moderator"],
+              post: ["@Bot","@Admin"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Use AutoMod to filter spam/promo text.",
+              "Make threads for members to discuss notable alerts."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "stocks",
+        name: "Stocks",
+        channels: [
+          {
+            id: "stocks-discussion",
+            name: "#stocks-discussion",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Stocks"],
+            defaultInOnboarding: true,
+            topic: "Stocks chat: catalysts, earnings reactions, thesis‑building.",
+            permissions: {
+              view: ["@Stocks","@Moderator"],
+              post: ["@Stocks"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Add a price/quote bot for slash commands (e.g., /price AAPL)."
+            ]
+          },
+          {
+            id: "stocks-forum",
+            name: "Stocks Forum",
+            type: "forum",
+            privacy: "private",
+            gatedBy: ["@Stocks"],
+            defaultInOnboarding: false,
+            topic: "Organized, searchable posts for stock ideas and reviews.",
+            permissions: {
+              view: ["@Stocks","@Moderator"],
+              post: ["@Stocks"],
+              manage: ["@Moderator"]
+            },
+            tags: ["Earnings","Momentum","Value","Long‑term"],
+            notes: [
+              "Pin a post with an earnings calendar and explain how to use threads."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "crypto",
+        name: "Crypto (optional)",
+        channels: [
+          {
+            id: "crypto-talk",
+            name: "#crypto-talk",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Crypto"],
+            defaultInOnboarding: false,
+            topic: "Crypto ideas, on‑chain curiosities. High‑risk disclosure in the topic.",
+            permissions: {
+              view: ["@Crypto","@Moderator"],
+              post: ["@Crypto"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Use AutoMod keyword filters for pump phrases.",
+              "Consider a pinned risk disclaimer."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "analysis-tools",
+        name: "Analysis & Tools",
+        channels: [
+          {
+            id: "charts-and-analysis",
+            name: "#charts-and-analysis",
+            type: "media",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: true,
+            topic: "Share charts and markups. Start a thread for deeper breakdowns.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Consider a chart/quote app from the App Directory to render quick visuals.",
+              "Encourage a one‑image, one‑thesis norm for clarity."
+            ]
+          },
+          {
+            id: "macro-news",
+            name: "#macro-news",
+            type: "text",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: true,
+            topic: "Macro updates: CPI, FOMC, rates, key headlines. Use threads for tangents.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified","@Bot"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Pipe in a reputable news bot; encourage member summaries."
+            ]
+          },
+          {
+            id: "tradingview-forum",
+            name: "TradingView Forum",
+            type: "forum",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Layouts, indicators, Pine Script. Tool‑specific questions and guides.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            tags: ["Indicators","Pine Script","Layouts"],
+            notes: [
+              "Keep tool talk from flooding main channels.",
+              "Invite members to share Pine snippets."
+            ]
+          },
+          {
+            id: "thinkorswim-forum",
+            name: "ThinkOrSwim Forum",
+            type: "forum",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "ToS studies, scans, strategy tester, hotkeys and workflows.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            tags: ["Scan Recipes","Strategy Tester","Hotkeys"],
+            notes: [
+              "Great place to archive reusable scans and backtests."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "community",
+        name: "Community & Off‑Topic",
+        channels: [
+          {
+            id: "general",
+            name: "#general",
+            type: "text",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: true,
+            topic: "Day‑to‑day chatter, tasteful memes, dry humor encouraged.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Use threads for long tangents. Slowmode if it spikes."
+            ]
+          },
+          {
+            id: "off-topic",
+            name: "#off-topic-lounge",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Anything non‑markets (music, life, gear).",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              post: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Opt‑in via Onboarding keeps main feed clean."
+            ]
+          },
+          {
+            id: "fitness",
+            name: "#fitness",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Health, routines, accountability check‑ins.",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              post: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: ["Create only if demand appears; prune if quiet."]
+          },
+          {
+            id: "gaming",
+            name: "#gaming",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Games, releases, quick lobby callouts.",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              post: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: ["Try Discord Activities (Chess, Gartic, Watch Together) in voice."]
+          },
+          {
+            id: "music",
+            name: "#music",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Playlists, concert threads, focus mixes for trading hours.",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              post: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "casual-voice-1",
+            name: "Casual Voice 1",
+            type: "voice",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Hangout voice. Soundboard allowed (tasteful).",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              connect: ["@Off‑Topic"],
+              speak: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "casual-voice-2",
+            name: "Casual Voice 2",
+            type: "voice",
+            privacy: "private",
+            gatedBy: ["@Off‑Topic"],
+            defaultInOnboarding: false,
+            topic: "Overflow/quiet room.",
+            permissions: {
+              view: ["@Off‑Topic","@Moderator"],
+              connect: ["@Off‑Topic"],
+              speak: ["@Off‑Topic"],
+              manage: ["@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "ama-forum",
+            name: "#ask-me-anything",
+            type: "forum",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Members post AMA questions for Adam; he can answer async or select for Stage.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            tags: ["Content","Strategy","Life","Tools"],
+            notes: []
+          }
+        ]
+      },
+
+      {
+        id: "events",
+        name: "Events & Engagement",
+        channels: [
+          {
+            id: "stage",
+            name: "InTheMoney Live",
+            type: "stage",
+            privacy: "public",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "AMAs, panels, workshops; audience hand‑raise enabled.",
+            permissions: {
+              view: ["@everyone"],
+              start: ["@Event Host"],
+              speak: ["@Stage Speaker"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "List events ahead of time; optionally enable public discovery."
+            ]
+          },
+          {
+            id: "stage-chat",
+            name: "#stage-chat",
+            type: "text",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Questions during Stage, resource links, and notes.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Moderators lightly tidy between events."
+            ]
+          },
+          {
+            id: "polls",
+            name: "#polls",
+            type: "text",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Vote on AMA topics, challenge themes, or tooling focus weeks.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified","@Admin","@Moderator"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Use Discord Polls (up to 10 options) with a clear end time."
+            ]
+          },
+          {
+            id: "challenges",
+            name: "#challenges",
+            type: "forum",
+            privacy: "public",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Monthly paper‑trading competitions. Recognize winners with vanity roles.",
+            permissions: {
+              view: ["@everyone"],
+              post: ["@Verified"],
+              manage: ["@Moderator"]
+            },
+            tags: ["P/L","Risk‑adjusted","Journal"],
+            notes: [
+              "If boosted, use Enhanced Role Styles for visual rewards."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "archive",
+        name: "Archive (Read‑Only) — Opt‑in via @Historian",
+        channels: [
+          {
+            id: "arch-stock-discussion",
+            name: "#stock-discussion",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Historical stock chat preserved for reference (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Lock Send Messages for @everyone/@Verified; allow only @Admin/@Moderator to post notices.",
+              "If an active channel shares this name, rename the archived one to #stock-discussion-archive."
+            ]
+          },
+          {
+            id: "arch-earnings",
+            name: "#earnings",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Earnings talk and calendars (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Add a pinned notice pointing to the new earnings process or forum tag."
+            ]
+          },
+          {
+            id: "arch-income-investing",
+            name: "#income-investing",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Dividends and income strategies (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "arch-crypto",
+            name: "#crypto",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Crypto discussions (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Make sure the active crypto channel, if any, is #crypto-talk to avoid naming collisions."
+            ]
+          },
+          {
+            id: "arch-in-the-news",
+            name: "#in-the-news",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: News links and reactions (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "arch-options-discussion",
+            name: "#options-discussion (archived)",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Options chat preserved read‑only; see the new #options-discussion for live talk.",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Rename the archived instance to include “(archived)” or “-archive” to avoid duplicate names."
+            ]
+          },
+          {
+            id: "arch-bullish",
+            name: "#bullish",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Bullish ticker ideas and sentiment (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "arch-bearish",
+            name: "#bearish",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Bearish ticker ideas and cautionary notes (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: []
+          },
+          {
+            id: "arch-strategies",
+            name: "#strategies",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: Strategy education threads (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Consider migrating the best long‑form posts into the Options or Stocks Forums."
+            ]
+          },
+          {
+            id: "arch-the-wheel",
+            name: "#the-wheel",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Historian"],
+            archived: true,
+            defaultInOnboarding: false,
+            topic: "LEGACY: The Wheel strategy discussions (read‑only).",
+            permissions: {
+              view: ["@Historian"],
+              post: [],
+              manage: ["@Admin","@Moderator"]
+            },
+            notes: [
+              "Add a pinned link to a fresh forum post describing the house approach to The Wheel."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "moderation",
+        name: "Moderation, Safety & Ops (Private)",
+        channels: [
+          {
+            id: "mod-chat",
+            name: "#mod-chat",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Admin","@Moderator"],
+            defaultInOnboarding: false,
+            topic: "Day‑to‑day coordination, decisions, playbooks.",
+            permissions: {
+              view: ["@Admin","@Moderator"],
+              post: ["@Admin","@Moderator"],
+              manage: ["@Admin"]
+            },
+            notes: []
+          },
+          {
+            id: "mod-log",
+            name: "#mod-log",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Admin","@Moderator"],
+            defaultInOnboarding: false,
+            topic: "AutoMod actions, joins/leaves, and moderation logs.",
+            permissions: {
+              view: ["@Admin","@Moderator"],
+              post: ["@Bot"],
+              manage: ["@Admin"]
+            },
+            notes: []
+          },
+          {
+            id: "mod-mail",
+            name: "#mod-mail",
+            type: "text",
+            privacy: "private",
+            gatedBy: ["@Admin","@Moderator"],
+            defaultInOnboarding: false,
+            topic: "Member reports & appeals, triage and follow‑up.",
+            permissions: {
+              view: ["@Admin","@Moderator"],
+              post: ["@Admin","@Moderator"],
+              manage: ["@Admin"]
+            },
+            notes: [
+              "Document a simple escalation ladder (timeouts → kicks → bans)."
+            ]
+          },
+          {
+            id: "bot-commands",
+            name: "#bot-commands",
+            type: "text",
+            privacy: "semi-private",
+            gatedBy: ["@Verified"],
+            defaultInOnboarding: false,
+            topic: "Keep bot spam here (/price, /help, etc.).",
+            permissions: {
+              view: ["@Verified","@Moderator"],
+              post: ["@Verified","@Bot"],
+              manage: ["@Moderator"]
+            },
+            notes: [
+              "Hide from default channel set to reduce noise."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "monetization",
+        name: "Optional Monetization",
+        channels: [
+          {
+            id: "premium-announcements",
+            name: "#premium-announcements",
+            type: "announcement",
+            privacy: "private",
+            gatedBy: ["@Premium"],
+            defaultInOnboarding: false,
+            topic: "Housekeeping and updates for subscribers (if tiers are added).",
+            permissions: {
+              view: ["@Premium","@Admin","@Moderator"],
+              post: ["@Admin","@Moderator"],
+              manage: ["@Admin"]
+            },
+            notes: [
+              "Use Server Shop for one‑time downloads or Subscriptions for tiers.",
+              "Keep public areas valuable even if you monetize."
+            ]
+          }
+        ]
+      },
+
+      {
+        id: "settings",
+        name: "Server Settings & Automations (Reference)",
+        channels: [
+          {
+            id: "onboarding",
+            name: "Onboarding (flow)",
+            type: "setting",
+            privacy: "n/a",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "3 quick questions map to interest roles and default channels. Members can reconfigure later.",
+            permissions: { manage: ["@Admin"] },
+            notes: [
+              "Require completion before posting; pick 7–9 welcoming default channels.",
+              "Add an opt‑in Archives question; selecting it grants @Historian for read‑only archive access."
+            ]
+          },
+          {
+            id: "rules-screening",
+            name: "Rules Screening",
+            type: "setting",
+            privacy: "n/a",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "Members must accept the rules to chat or DM.",
+            permissions: { manage: ["@Admin","@Moderator"] },
+            notes: [
+              "Keep rules short; link to longer guidance in #faq-and-guides."
+            ]
+          },
+          {
+            id: "verification",
+            name: "Verification & Apply to Join",
+            type: "setting",
+            privacy: "n/a",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "Set verification to Medium or High; optionally enable member applications.",
+            permissions: { manage: ["@Admin"] },
+            notes: [
+              "High adds a 10‑minute gate; Applications allow gentle vetting."
+            ]
+          },
+          {
+            id: "automod",
+            name: "AutoMod & Raid Protection",
+            type: "setting",
+            privacy: "n/a",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "Keyword filters for scams/pumps; alerts & CAPTCHA during join raids.",
+            permissions: { manage: ["@Admin","@Moderator"] },
+            notes: [
+              "Set timeouts on first offenses; pause invites/DMs during raids."
+            ]
+          },
+          {
+            id: "priority-speaker",
+            name: "Priority Speaker Setup",
+            type: "setting",
+            privacy: "n/a",
+            gatedBy: [],
+            defaultInOnboarding: false,
+            topic: "Amplify hosts in voice so teaching stays audible.",
+            permissions: { manage: ["@Admin","@Moderator"] },
+            notes: []
+          }
+        ]
+      }
+
+    ]
+  };
+
+  // ---------- Rendering -------------------------------------------------------
+  const accordion = document.getElementById('accordion');
+  const detailPanel = document.getElementById('detailPanel');
+  const searchInput = document.getElementById('searchInput');
+  const togglePrivateBtn = document.getElementById('togglePrivate');
+  const expandAllBtn = document.getElementById('expandAll');
+  const collapseAllBtn = document.getElementById('collapseAll');
+  const exportMdBtn = document.getElementById('exportMd');
+
+  // Mobile overlay elements
+  const overlay = document.getElementById('overlay');
+  const sheetBody = document.getElementById('sheetBody');
+  const closeSheetBtn = document.getElementById('closeSheetBtn');
+
+  const mqMobile = window.matchMedia('(max-width: 900px)');
+  let isMobile = mqMobile.matches;
+  mqMobile.addEventListener('change', (e) => { isMobile = e.matches; if(!isMobile){ closeOverlay(); } });
+
+  let hidePrivate = false;
+  let selectedChannelId = null;
+
+  function channelTypeEmoji(type){
+    switch(type){
+      case 'text': return '💬';
+      case 'forum': return '🧵';
+      case 'media': return '🖼️';
+      case 'announcement': return '📣';
+      case 'stage': return '🎙️';
+      case 'voice': return '🔊';
+      case 'setting': return '🔧';
+      default: return '📎';
+    }
+  }
+
+  function privacyBadge(privacy, gatedBy){
+    const badges = [];
+    let className = 'public';
+    let label = 'Public';
+    if(privacy === 'public-readonly'){ className = 'public'; label = 'Public (read‑only)'; }
+    if(privacy === 'private'){ className = 'private'; label = 'Private'; }
+    if(privacy === 'semi-private'){ className = 'private'; label = 'Semi‑private'; }
+    if(privacy === 'n/a'){ className = 'public'; label = '—'; }
+    badges.push(`<span class="badge ${className}" title="Visibility">${label}</span>`);
+    if((gatedBy||[]).length){
+      badges.push(`<span class="badge gated" title="Gated by role">${gatedBy.join(', ')}</span>`);
+    }
+    return badges.join(' ');
+  }
+
+  function typeBadge(type, subtype, archived){
+    const t = type.charAt(0).toUpperCase() + type.slice(1);
+    const s = subtype === 'resource' ? ' (Resource Page)' : '';
+    const a = archived ? '<span class="badge archived">Archived</span>' : '';
+    return `<span class="badge type">${t}${s}</span> ${a}`;
+  }
+
+  function channelListItem(channel){
+    const type = channelTypeEmoji(channel.type);
+    const badges = [typeBadge(channel.type, channel.subtype, channel.archived), privacyBadge(channel.privacy, channel.gatedBy)];
+    let classes = "channel";
+    if (selectedChannelId === channel.id) classes += " selected";
+    return `
+      <div class="${classes}" data-channel-id="${channel.id}" role="button" tabindex="0" aria-label="Open ${channel.name} details">
+        <div class="ch-left">
+          <span>${type}</span>
+          <span class="mono">${channel.name}</span>
+        </div>
+        <div class="ch-right">
+          ${badges.join(' ')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAccordion(){
+    const q = (searchInput.value || '').toLowerCase().trim();
+    accordion.innerHTML = '';
+    DATA.categories.forEach(cat => {
+      // Filter channels by search & hidePrivate
+      const visibleChannels = cat.channels.filter(ch => {
+        if (hidePrivate && (ch.privacy === 'private' || ch.privacy === 'semi-private')) return false;
+        if (!q) return true;
+        const hay = [
+          ch.name, ch.type, ch.subtype || '',
+          (ch.topic || ''), (ch.notes || []).join(' '),
+          (ch.archived ? 'archived' : ''),
+          ...(ch.gatedBy || []),
+          ...Object.values(ch.permissions || {}).flat()
+        ].join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+      if (!visibleChannels.length) return;
+
+      const el = document.createElement('details');
+      el.className = 'category';
+      el.setAttribute('data-category-id', cat.id);
+      el.innerHTML = `
+        <summary>
+          <div class="cat-title">
+            <span>📁</span>
+            <span class="name">${cat.name}</span>
+            <span class="meta">• ${visibleChannels.length} ${visibleChannels.length===1?'channel':'channels'}</span>
+          </div>
+          <div></div>
+        </summary>
+        <div class="cat-list">
+          ${visibleChannels.map(channelListItem).join('')}
+        </div>
+      `;
+      accordion.appendChild(el);
+    });
+
+    // Wire up click handlers
+    accordion.querySelectorAll('.channel').forEach(node => {
+      node.addEventListener('click', () => openChannel(node.dataset.channelId));
+      node.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChannel(node.dataset.channelId); }
+      });
+    });
+  }
+
+  function openChannel(id){
+    selectedChannelId = id;
+    // Re-render to apply 'selected' class
+    renderAccordion();
+    // Find channel
+    const {channel, category} = findChannelById(id);
+    if(!channel){ return; }
+    const html = renderDetail(channel, category);
+    if(isMobile){
+      openOverlay(html, channel.name);
+    } else {
+      detailPanel.innerHTML = html;
+      // Scroll to top of detail panel on desktop for convenience
+      detailPanel.scrollTo({top:0, behavior:'smooth'});
+    }
+  }
+
+  function findChannelById(id){
+    for(const cat of DATA.categories){
+      for(const ch of cat.channels){
+        if(ch.id === id) return {channel: ch, category: cat};
+      }
+    }
+    return {channel: null, category: null};
+  }
+
+  function renderKV(label, value){
+    return `<span class="key">${label}</span><span class="val">${value}</span>`;
+  }
+
+  function renderPerms(perms){
+    if(!perms) return '<p class="muted">—</p>';
+    let html = '<div class="kv">';
+    if(perms.view) html += renderKV('View', perms.view.join(', '));
+    if(perms.post) html += renderKV('Post', perms.post.join(', '));
+    if(perms.connect) html += renderKV('Connect', perms.connect.join(', '));
+    if(perms.speak) html += renderKV('Speak', perms.speak.join(', '));
+    if(perms.prioritySpeaker) html += renderKV('Priority', perms.prioritySpeaker.join(', '));
+    if(perms.start) html += renderKV('Start', perms.start.join(', '));
+    if(perms.manage) html += renderKV('Manage', perms.manage.join(', '));
+    html += '</div>';
+    return html;
+  }
+
+  function mdForChannel(ch, category){
+    const gates = (ch.gatedBy && ch.gatedBy.length) ? ` • Gated by: ${ch.gatedBy.join(', ')}` : '';
+    const subtype = ch.subtype === 'resource' ? ' (Resource Page)' : '';
+    const archived = ch.archived ? ' • Archived: Yes' : '';
+    const tags = ch.tags && ch.tags.length ? `\n- Tags: ${ch.tags.join(', ')}` : '';
+    const notes = ch.notes && ch.notes.length ? `\n- Notes:\n  - ${ch.notes.join('\n  - ')}` : '';
+    const perms = ch.permissions ? Object.entries(ch.permissions).map(([k,v])=>`  - ${k}: ${v.join(', ')}`).join('\n') : '';
+    return `### ${ch.name}
+- Category: ${category.name}
+- Type: ${ch.type}${subtype} • Privacy: ${ch.privacy}${gates}${archived}
+- Topic: ${ch.topic}
+- Default in Onboarding: ${ch.defaultInOnboarding ? 'Yes' : 'No'}${tags}
+- Permissions:\n${perms}${notes}
+`;
+  }
+
+  function renderDetail(ch, category){
+    const type = channelTypeEmoji(ch.type);
+    const subtype = ch.subtype === 'resource' ? ' (Resource Page)' : '';
+    const gates = (ch.gatedBy && ch.gatedBy.length) ? `<span class="badge gated">Gated: ${ch.gatedBy.join(', ')}</span>` : '';
+    const tags = ch.tags && ch.tags.length ? `<ul class="list">${ch.tags.map(t=>`<li>${t}</li>`).join('')}</ul>` : '<p class="muted">—</p>';
+    const notes = ch.notes && ch.notes.length ? `<ul class="list">${ch.notes.map(n=>`<li>${n}</li>`).join('')}</ul>` : '<p class="muted">—</p>';
+    const archived = ch.archived ? `<span class="badge archived">Archived</span>` : '';
+
+    return `
+      <div class="details">
+        <h2>${type} ${ch.name}</h2>
+        <div class="subtle">${category.name} • ${ch.type}${subtype} • ${ch.privacy.replace('-', ' ')} ${gates} ${archived}</div>
+
+        <div class="grid section">
+          <div class="card">
+            <h3>Topic</h3>
+            <p>${ch.topic || '<span class="muted">—</span>'}</p>
+          </div>
+          <div class="card">
+            <h3>Visibility & Gating</h3>
+            <div class="kv">
+              ${renderKV('Privacy', ch.privacy)}
+              ${renderKV('Gated by', (ch.gatedBy && ch.gatedBy.length) ? ch.gatedBy.join(', ') : '—')}
+              ${renderKV('Default in Onboarding', ch.defaultInOnboarding ? 'Yes' : 'No')}
+              ${renderKV('Archived', ch.archived ? 'Yes' : 'No')}
+            </div>
+          </div>
+          <div class="card">
+            <h3>Permissions</h3>
+            ${renderPerms(ch.permissions)}
+          </div>
+          <div class="card">
+            <h3>Forum Tags</h3>
+            ${tags}
+          </div>
+        </div>
+
+        <div class="section card">
+          <h3>Notes</h3>
+          ${notes}
+        </div>
+
+        <div class="toolbar">
+          <button class="btn" onclick="copyMd(${JSON.stringify(ch.id)})">Copy as Markdown</button>
+          <button class="btn ghost" onclick="copyText(${JSON.stringify(ch.name)})">Copy channel name</button>
+        </div>
+
+        <div class="footer">
+          <span class="pill">Built for Adam’s InTheMoney community</span>
+          <span class="muted">•</span>
+          <span class="muted">Tip: ${ch.archived ? 'Search “@Historian” or “archived” to list legacy channels.' : 'Use search to filter by role or channel type.'}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // ---------- Mobile overlay helpers -----------------------------------------
+  function openOverlay(innerHTML, titleText){
+    sheetBody.innerHTML = innerHTML;
+    document.getElementById('sheetTitle').textContent = titleText || 'Channel details';
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+  }
+  function closeOverlay(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  closeSheetBtn.addEventListener('click', closeOverlay);
+  overlay.addEventListener('click', (e) => {
+    if(e.target === overlay){ closeOverlay(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay();
+  });
+
+  // ---------- Controls --------------------------------------------------------
+  function copyMd(channelId){
+    const {channel, category} = findChannelById(channelId);
+    if(!channel) return;
+    const md = mdForChannel(channel, category);
+    navigator.clipboard.writeText(md).then(()=>{
+      alert("Markdown copied to clipboard.");
+    });
+  }
+  function copyText(text){
+    navigator.clipboard.writeText(text).then(()=>{
+      alert("Copied to clipboard.");
+    });
+  }
+
+  searchInput.addEventListener('input', () => renderAccordion());
+  togglePrivateBtn.addEventListener('click', () => {
+    hidePrivate = !hidePrivate;
+    togglePrivateBtn.textContent = hidePrivate ? 'Show private' : 'Hide private';
+    renderAccordion();
+  });
+
+  expandAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('details.category').forEach(d => d.open = true);
+  });
+  collapseAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('details.category').forEach(d => d.open = false);
+  });
+
+  exportMdBtn.addEventListener('click', () => {
+    let md = `# InTheMoney — Discord Server Map\n\n`;
+    for(const cat of DATA.categories){
+      md += `## ${cat.name}\n\n`;
+      for(const ch of cat.channels){
+        md += mdForChannel(ch, cat) + '\n';
+      }
+    }
+    const blob = new Blob([md], {type: 'text/markdown'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'InTheMoney-Discord-Server-Map.md';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Initial render
+  renderAccordion();
+  </script>
+</body>
+</html>
