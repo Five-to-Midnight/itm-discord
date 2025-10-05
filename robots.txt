@@ -1,0 +1,5 @@
+# robots.txt for an unlisted GitHub Pages site
+# This tells most crawlers not to crawl any pages.
+# Note: Anyone with the link can still access the site directly.
+User-agent: *
+Disallow: /

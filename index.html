@@ -4,6 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="googlebot" content="noindex, nofollow" />
   <title>InTheMoney — Discord Server Map</title>
   <style>
     :root{
@@ -33,7 +35,7 @@
     header{
       position: sticky;
       top:0;
-      z-index: 20;
+      z-index: 40;
       backdrop-filter: blur(8px);
       background: rgba(15,17,21,.7);
       border-bottom: 1px solid var(--border);
@@ -45,7 +47,7 @@
       padding: 12px 16px;
       display: grid;
       grid-template-columns: 1fr auto auto;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
     }
     .title{
@@ -61,22 +63,19 @@
       border: 1px solid var(--border);
       padding: 8px 10px;
       border-radius: 10px;
-      min-width: 0;
-      width: 420px;
-      max-width: 100%;
+      min-width: 320px;
     }
     .searchbar input{
       background: transparent;
       border: none;
       outline: none;
       color: var(--text);
-      width: 100%;
+      width: 260px;
     }
     .controls{
       display:flex;
       align-items:center;
       gap:8px;
-      flex-wrap: wrap;
     }
     .btn{
       border: 1px solid var(--border);
@@ -86,12 +85,12 @@
       border-radius: 10px;
       cursor: pointer;
       transition: .15s ease-in-out;
-      font-size: 13px;
     }
     .btn:hover{ transform: translateY(-1px); background: var(--panel-2); }
+    .btn.icon{ padding: 8px 10px; }
     .layout{
       max-width: 1200px;
-      margin: 12px auto 60px;
+      margin: 16px auto;
       padding: 0 16px 40px;
       display: grid;
       grid-template-columns: 360px 1fr;
@@ -109,7 +108,7 @@
       max-height: calc(100vh - 110px);
     }
     .right {
-      padding: 16px;
+      padding: 18px;
       min-height: 420px;
     }
     .legend{
@@ -136,13 +135,14 @@
     details.category > summary{
       list-style: none;
       cursor: pointer;
-      padding: 12px 14px;
+      padding: 14px;
       display:flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       user-select: none;
       outline: none;
+      font-size: 15px;
     }
     details.category[open] > summary{ border-bottom: 1px solid var(--border); }
     .cat-title{ display:flex; gap:8px; align-items:center; }
@@ -158,15 +158,15 @@
       grid-template-columns: 1fr auto;
       gap: 8px;
       align-items: center;
-      padding: 10px 10px;
-      border-radius: 10px;
+      padding: 12px 12px;
+      border-radius: 12px;
       border: 1px solid transparent;
       cursor: pointer;
+      font-size: 15px;
     }
     .channel:hover{ background: #202636; border-color: var(--border); }
     .channel.selected{ background: #1f2634; border-color: var(--accent); }
     .ch-left{ display:flex; align-items:center; gap:10px; }
-    .ch-right{ display:flex; gap:6px; flex-wrap: wrap; justify-self: end; }
     .badge{ font-size: 11px; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--border); background: #151922; color: var(--muted); }
     .badge.type{ color: var(--accent); border-color: #2a3550; background: #151a25; }
     .badge.private{ color: #eab308; border-color: #57441c; background: #1a1711; }
@@ -195,9 +195,9 @@
     }
     .card h3{ margin: 0 0 8px 0; font-size: 14px; color: var(--muted); letter-spacing: .3px; text-transform: uppercase; }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    .kv{ display:grid; grid-template-columns: 120px 1fr; gap: 6px 10px; align-items: start; }
+    .kv{ display:grid; grid-template-columns: 130px 1fr; gap: 8px 12px; align-items: start; }
     .kv span.key{ color: var(--muted); font-size: 12px; }
-    .kv span.val{ font-size: 13px; }
+    .kv span.val{ font-size: 14px; }
     .list{ margin: 0; padding-left: 18px; }
     .muted{ color: var(--muted); }
     .section{ margin-top: 14px; }
@@ -206,80 +206,78 @@
     .footer{ margin-top: 16px; display:flex; gap: 10px; align-items:center; color: var(--muted); font-size: 12px; flex-wrap: wrap; }
     .pill{ background: #1a1f2a; border: 1px solid var(--border); padding: 4px 8px; border-radius: 999px; }
 
-    /* --- Mobile styles --- */
-    @media (max-width: 900px){
-      .header-inner{ grid-template-columns: 1fr; }
-      .layout{ grid-template-columns: 1fr; margin-bottom: 80px; }
-      .left{ max-height: none; }
-      .grid{ grid-template-columns: 1fr; }
-      .btn{ padding: 8px 10px; font-size: 13px; }
-      .channel{ padding: 12px; }
-    }
-    @media (max-width: 600px){
-      .ch-right{ display: none; } /* keep list compact */
-      .title{ font-size: 16px; }
-      .searchbar{ width: 100%; }
-      .card{ padding: 10px; }
-    }
-
-    /* --- Mobile detail bottom sheet overlay --- */
-    .overlay{
+    /* Drawer overlay for mobile */
+    .drawer-toggle{ display: none; }
+    .backdrop{
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.45);
-      display: none;
-      z-index: 50;
+      background: rgba(0,0,0,.5);
+      z-index: 35;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
     }
-    .overlay.open{ display: block; }
-    .sheet{
+    body.drawer-open .backdrop{ opacity: 1; pointer-events: auto; }
+    .left.mobile-drawer{
       position: fixed;
-      left: 0;
-      right: 0;
-      bottom: -100%;
-      background: var(--panel);
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
-      box-shadow: 0 -10px 30px rgba(0,0,0,.5);
-      max-height: 85vh;
-      overflow: auto;
-      transition: transform .25s ease-out, bottom .25s ease-out;
-      transform: translateY(0);
+      top: 58px; /* header height approx; will be adjusted by JS */
+      left: 0; right: 0; bottom: 0;
+      max-height: calc(100vh - 58px);
+      transform: translateY(8px);
+      z-index: 36;
+      display: none;
     }
-    .overlay.open .sheet{ bottom: 0; }
-    .sheet-header{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
+    body.drawer-open .left.mobile-drawer{ display: block; }
+    .mobile-controls{
+      display: none;
+      gap: 8px;
+      margin-bottom: 10px;
       position: sticky;
-      top: 0;
+      top: -12px;
       background: var(--panel);
-      border-top-left-radius: 16px;
-      border-top-right-radius: 16px;
-      z-index:1;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
     }
-    .sheet-title{ font-weight:700; font-size:14px; }
-    .sheet-body{ padding: 12px 14px; }
-    .close-x{
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 10px;
-      color: var(--text);
-      cursor: pointer;
+    .mobile-controls .btn{ flex: 1 1 auto; }
+    .mobile-only{ display: none; }
+
+    @media (max-width: 900px){
+      .header-inner{
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+      }
+      .searchbar{ min-width: 0; width: 100%; }
+      .controls{ display: none; } /* hide desktop controls */
+      .drawer-toggle{ display: inline-flex; }
+      .layout{ grid-template-columns: 1fr; }
+      .left{ display: none; } /* hide sidebar in flow; we use drawer instead */
+      .left.mobile-drawer{ display: none; }
+      .right{ padding: 16px; }
+      .grid{ grid-template-columns: 1fr; } /* single column cards */
+      .mobile-controls{ display: flex; }
+      .channel{ padding: 14px; font-size: 16px; } /* larger tap targets */
+      .kv{ grid-template-columns: 120px 1fr; }
+      body.drawer-open{ overflow: hidden; }
+    }
+
+    @media (max-width: 420px){
+      .title{ font-size: 16px; }
+      .searchbar input{ width: 100%; }
+      .btn{ padding: 8px 8px; }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-inner">
+      <button class="btn drawer-toggle" id="openDrawer" aria-label="Open channel browser">☰ Browse</button>
       <div class="title">📋 InTheMoney — Discord Server Map</div>
       <div class="searchbar" role="search">
-        <span class="muted">🔎</span>
+        <span class="muted" aria-hidden="true">🔎</span>
         <input id="searchInput" type="search" placeholder="Filter channels by name, type, role, or notes…" aria-label="Filter channels" />
       </div>
-      <div class="controls">
+      <div class="controls" aria-label="Page controls">
         <button class="btn" id="expandAll">Expand all</button>
         <button class="btn" id="collapseAll">Collapse all</button>
         <button class="btn" id="togglePrivate">Hide private</button>
@@ -288,8 +286,12 @@
     </div>
   </header>
 
+  <!-- Backdrop for mobile drawer -->
+  <div id="backdrop" class="backdrop" aria-hidden="true"></div>
+
   <main class="layout" role="main">
-    <aside class="left">
+    <!-- The desktop sidebar (hidden on mobile); the same content is reused as a drawer -->
+    <aside class="left" id="sidebarDesktop" aria-label="Channel browser (desktop)">
       <div class="legend" aria-label="Type legend">
         <span class="chip">💬 Text</span>
         <span class="chip">🧵 Forum</span>
@@ -302,10 +304,30 @@
       <div id="accordion" class="accordion" aria-live="polite"></div>
     </aside>
 
+    <!-- Mobile drawer version of the sidebar -->
+    <aside class="left mobile-drawer" id="sidebarMobile" aria-label="Channel browser (mobile drawer)">
+      <div class="mobile-controls">
+        <button class="btn" id="mobileExpand">Expand</button>
+        <button class="btn" id="mobileCollapse">Collapse</button>
+        <button class="btn" id="mobileTogglePrivate">Hide private</button>
+        <button class="btn" id="mobileClose">Close</button>
+      </div>
+      <div class="legend" aria-label="Type legend">
+        <span class="chip">💬 Text</span>
+        <span class="chip">🧵 Forum</span>
+        <span class="chip">🖼️ Media</span>
+        <span class="chip">📣 Announcement</span>
+        <span class="chip">🎙️ Stage</span>
+        <span class="chip">🔊 Voice</span>
+        <span class="chip">🔧 Setting</span>
+      </div>
+      <div id="accordionMobile" class="accordion" aria-live="polite"></div>
+    </aside>
+
     <section class="right" id="detailPanel" aria-live="polite" aria-atomic="true">
       <div class="details">
         <h2>Pick a channel</h2>
-        <p class="subtle">Expand a category on the left, then click any channel to see its topic, permissions, gating, tags, and notes.</p>
+        <p class="subtle">Tap <b>Browse</b>, expand a category, then select any channel to see its topic, permissions, gating, tags, and notes. On desktop, the list stays open.</p>
         <div class="section">
           <div class="card">
             <h3>Role key</h3>
@@ -329,17 +351,6 @@
       </div>
     </section>
   </main>
-
-  <!-- Mobile detail overlay -->
-  <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-      <div class="sheet-header">
-        <div class="sheet-title" id="sheetTitle">Channel details</div>
-        <button class="close-x" id="closeSheetBtn" aria-label="Close">Close</button>
-      </div>
-      <div class="sheet-body" id="sheetBody"></div>
-    </div>
-  </div>
 
   <script>
   // ---------- Data Model ------------------------------------------------------
@@ -1263,24 +1274,25 @@
     ]
   };
 
-  // ---------- Rendering -------------------------------------------------------
-  const accordion = document.getElementById('accordion');
+  // ---------- Rendering & State ----------------------------------------------
+  const sidebarDesktop = document.getElementById('sidebarDesktop');
+  const sidebarMobile  = document.getElementById('sidebarMobile');
+  const accordionDesktop = document.getElementById('accordion');
+  const accordionMobile  = document.getElementById('accordionMobile');
   const detailPanel = document.getElementById('detailPanel');
   const searchInput = document.getElementById('searchInput');
   const togglePrivateBtn = document.getElementById('togglePrivate');
   const expandAllBtn = document.getElementById('expandAll');
   const collapseAllBtn = document.getElementById('collapseAll');
   const exportMdBtn = document.getElementById('exportMd');
+  const openDrawerBtn = document.getElementById('openDrawer');
+  const mobileCloseBtn = document.getElementById('mobileClose');
+  const mobileExpandBtn = document.getElementById('mobileExpand');
+  const mobileCollapseBtn = document.getElementById('mobileCollapse');
+  const mobileTogglePrivateBtn = document.getElementById('mobileTogglePrivate');
+  const backdrop = document.getElementById('backdrop');
 
-  // Mobile overlay elements
-  const overlay = document.getElementById('overlay');
-  const sheetBody = document.getElementById('sheetBody');
-  const closeSheetBtn = document.getElementById('closeSheetBtn');
-
-  const mqMobile = window.matchMedia('(max-width: 900px)');
-  let isMobile = mqMobile.matches;
-  mqMobile.addEventListener('change', (e) => { isMobile = e.matches; if(!isMobile){ closeOverlay(); } });
-
+  const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
   let hidePrivate = false;
   let selectedChannelId = null;
 
@@ -1337,11 +1349,36 @@
     `;
   }
 
-  function renderAccordion(){
+  function renderAccordions(){
+    // Capture open state before re-render (both containers)
+    const openDesktop = new Set(Array.from(accordionDesktop.querySelectorAll('details.category[open]')).map(d => d.dataset.categoryId));
+    const openMobile  = new Set(Array.from(accordionMobile.querySelectorAll('details.category[open]')).map(d => d.dataset.categoryId));
+
+    // Render fresh content
+    renderAccordionInto(accordionDesktop);
+    renderAccordionInto(accordionMobile);
+
+    // Restore open state and ensure selected channel's category stays open
+    function restore(container, openSet){
+      container.querySelectorAll('details.category').forEach(d => {
+        if(openSet.has(d.dataset.categoryId)) d.open = true;
+      });
+      if(selectedChannelId){
+        const node = container.querySelector('.channel[data-channel-id="' + CSS.escape(selectedChannelId) + '"]');
+        if(node){
+          const det = node.closest('details.category');
+          if(det) det.open = true;
+        }
+      }
+    }
+    restore(accordionDesktop, openDesktop);
+    restore(accordionMobile, openMobile);
+  }
+
+  function renderAccordionInto(container){
     const q = (searchInput.value || '').toLowerCase().trim();
-    accordion.innerHTML = '';
+    container.innerHTML = '';
     DATA.categories.forEach(cat => {
-      // Filter channels by search & hidePrivate
       const visibleChannels = cat.channels.filter(ch => {
         if (hidePrivate && (ch.privacy === 'private' || ch.privacy === 'semi-private')) return false;
         if (!q) return true;
@@ -1372,33 +1409,30 @@
           ${visibleChannels.map(channelListItem).join('')}
         </div>
       `;
-      accordion.appendChild(el);
+      container.appendChild(el);
     });
 
     // Wire up click handlers
-    accordion.querySelectorAll('.channel').forEach(node => {
-      node.addEventListener('click', () => openChannel(node.dataset.channelId));
+    container.querySelectorAll('.channel').forEach(node => {
+      node.addEventListener('click', () => {
+        openChannel(node.dataset.channelId);
+        if (isMobile()) closeDrawer(); // keep behavior; categories persist when drawer reopened
+      });
       node.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChannel(node.dataset.channelId); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChannel(node.dataset.channelId); if (isMobile()) closeDrawer(); }
       });
     });
   }
 
   function openChannel(id){
     selectedChannelId = id;
-    // Re-render to apply 'selected' class
-    renderAccordion();
-    // Find channel
+    // Re-render accordions to apply 'selected' highlight but preserve open state
+    renderAccordions();
     const {channel, category} = findChannelById(id);
     if(!channel){ return; }
-    const html = renderDetail(channel, category);
-    if(isMobile){
-      openOverlay(html, channel.name);
-    } else {
-      detailPanel.innerHTML = html;
-      // Scroll to top of detail panel on desktop for convenience
-      detailPanel.scrollTo({top:0, behavior:'smooth'});
-    }
+    detailPanel.innerHTML = renderDetail(channel, category);
+    // Update hash for deep link
+    try{ history.replaceState(null, '', '#channel=' + encodeURIComponent(id)); }catch(e){}
   }
 
   function findChannelById(id){
@@ -1489,64 +1523,86 @@
         <div class="toolbar">
           <button class="btn" onclick="copyMd(${JSON.stringify(ch.id)})">Copy as Markdown</button>
           <button class="btn ghost" onclick="copyText(${JSON.stringify(ch.name)})">Copy channel name</button>
+          <button class="btn ghost" onclick="copyDeepLink(${JSON.stringify(ch.id)})">Copy deep link</button>
         </div>
 
         <div class="footer">
           <span class="pill">Built for Adam’s InTheMoney community</span>
           <span class="muted">•</span>
-          <span class="muted">Tip: ${ch.archived ? 'Search “@Historian” or “archived” to list legacy channels.' : 'Use search to filter by role or channel type.'}</span>
+          <span class="muted">Tip: Search “@Historian” or “archived” to list legacy channels.</span>
         </div>
       </div>
     `;
   }
 
-  // ---------- Mobile overlay helpers -----------------------------------------
-  function openOverlay(innerHTML, titleText){
-    sheetBody.innerHTML = innerHTML;
-    document.getElementById('sheetTitle').textContent = titleText || 'Channel details';
-    overlay.classList.add('open');
-    overlay.setAttribute('aria-hidden', 'false');
+  // ---------- Drawer & Controls ---------------------------------------------
+  function openDrawer(){
+    // Add class for CSS-driven behavior
+    document.body.classList.add('drawer-open');
+    // Dynamic top/max-height based on actual header height (iOS safe)
+    try{
+      const header = document.querySelector('header');
+      const h = header ? header.offsetHeight : 58;
+      sidebarMobile.style.top = h + 'px';
+      sidebarMobile.style.maxHeight = 'calc(100vh - ' + h + 'px)';
+    }catch(e){}
+    // Fallback: if CSS didn't display it, force it visible
+    try{
+      const cs = window.getComputedStyle(sidebarMobile);
+      if (cs && cs.display === 'none') {
+        sidebarMobile.style.display = 'block';
+      }
+      // Make backdrop interactive even if class fails
+      backdrop.style.opacity = '1';
+      backdrop.style.pointerEvents = 'auto';
+    }catch(e){}
   }
-  function closeOverlay(){
-    overlay.classList.remove('open');
-    overlay.setAttribute('aria-hidden', 'true');
+  function closeDrawer(){
+    document.body.classList.remove('drawer-open');
+    try{
+      sidebarMobile.style.display = '';
+      backdrop.style.opacity = '';
+      backdrop.style.pointerEvents = '';
+    }catch(e){}
   }
-  closeSheetBtn.addEventListener('click', closeOverlay);
-  overlay.addEventListener('click', (e) => {
-    if(e.target === overlay){ closeOverlay(); }
-  });
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay();
-  });
 
-  // ---------- Controls --------------------------------------------------------
+  openDrawerBtn.addEventListener('click', openDrawer);
+  mobileCloseBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+
+  function expandAll(){ document.querySelectorAll('details.category').forEach(d => d.open = true); }
+  function collapseAll(){ document.querySelectorAll('details.category').forEach(d => d.open = false); }
+
+  expandAllBtn.addEventListener('click', () => { expandAll(); });
+  collapseAllBtn.addEventListener('click', () => { collapseAll(); });
+
+  mobileExpandBtn.addEventListener('click', () => { expandAll(); });
+  mobileCollapseBtn.addEventListener('click', () => { collapseAll(); });
+
+  function togglePrivate(){
+    hidePrivate = !hidePrivate;
+    togglePrivateBtn.textContent = hidePrivate ? 'Show private' : 'Hide private';
+    mobileTogglePrivateBtn.textContent = hidePrivate ? 'Show private' : 'Hide private';
+    renderAccordions();
+  }
+  togglePrivateBtn.addEventListener('click', togglePrivate);
+  mobileTogglePrivateBtn.addEventListener('click', togglePrivate);
+
   function copyMd(channelId){
     const {channel, category} = findChannelById(channelId);
     if(!channel) return;
     const md = mdForChannel(channel, category);
-    navigator.clipboard.writeText(md).then(()=>{
-      alert("Markdown copied to clipboard.");
-    });
+    navigator.clipboard.writeText(md).then(()=> alert("Markdown copied to clipboard."));
   }
   function copyText(text){
-    navigator.clipboard.writeText(text).then(()=>{
-      alert("Copied to clipboard.");
-    });
+    navigator.clipboard.writeText(text).then(()=> alert("Copied to clipboard."));
+  }
+  function copyDeepLink(id){
+    const url = location.origin + location.pathname + '#channel=' + encodeURIComponent(id);
+    navigator.clipboard.writeText(url).then(()=> alert("Deep link copied."));
   }
 
-  searchInput.addEventListener('input', () => renderAccordion());
-  togglePrivateBtn.addEventListener('click', () => {
-    hidePrivate = !hidePrivate;
-    togglePrivateBtn.textContent = hidePrivate ? 'Show private' : 'Hide private';
-    renderAccordion();
-  });
-
-  expandAllBtn.addEventListener('click', () => {
-    document.querySelectorAll('details.category').forEach(d => d.open = true);
-  });
-  collapseAllBtn.addEventListener('click', () => {
-    document.querySelectorAll('details.category').forEach(d => d.open = false);
-  });
+  searchInput.addEventListener('input', () => renderAccordions());
 
   exportMdBtn.addEventListener('click', () => {
     let md = `# InTheMoney — Discord Server Map\n\n`;
@@ -1565,8 +1621,26 @@
     URL.revokeObjectURL(url);
   });
 
+  // Deep-link loader
+  function loadFromHash(){
+    const m = location.hash.match(/#channel=([^&]+)/);
+    if(m){
+      const id = decodeURIComponent(m[1]);
+      const found = findChannelById(id);
+      if(found && found.channel){
+        openChannel(id);
+        // Expand matching category panels so users can see context when drawer is open
+        document.querySelectorAll('details.category').forEach(d => {
+          if (d.querySelector('.channel[data-channel-id="' + CSS.escape(id) + '"]')) d.open = true;
+        });
+      }
+    }
+  }
+  window.addEventListener('hashchange', loadFromHash);
+
   // Initial render
-  renderAccordion();
+  renderAccordions();
+  loadFromHash();
   </script>
 </body>
 </html>
