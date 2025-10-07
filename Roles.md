@@ -57,7 +57,18 @@
 | Send Voice Messages                     |      ❌      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | Create Polls                            |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | **Voice Channel Permissions**           |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
-| 
+| Connect                                 |      ✅      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ✅      |       ✅       |   ❌   |    ❌     |
+| Speak                                   |      ✅      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ✅      |       ✅       |   ❌   |    ❌     |
+| Video                                   |      ✅      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ✅      |       ✅       |   ❌   |    ❌     |
+| Use Soundboard                          |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Use External Sounds                     |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Use Voice Activity                      |      ✅      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ✅      |       ✅       |   ❌   |    ❌     |
+| Priority Speaker                        |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ✅      |       ✅       |   ❌   |    ❌     |
+| Mute Members                            |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Deafen Members                          |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Move Members                            |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Set Voice Channel Status                |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+|                                         |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
 
 
 Rationale
