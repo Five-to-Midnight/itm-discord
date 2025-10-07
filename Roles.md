@@ -68,6 +68,17 @@
 | Deafen Members                          |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | Move Members                            |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | Set Voice Channel Status                |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| **Apps Permissions**                    |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
+| Use Application Commands                |      ✅      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ✅      |       ❌       |   ❌   |    ❌     |
+| Use Activities                          |      ✅      |       ✅        |     ❌     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Use External Apps                       |      ❌      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| **Stage Channel Permissions**           |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
+| Request to Speak                        |      ❌      |       ✅        |     ✅     |  ❌  |    ✅     |    ✅    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| **Events Permissions**                  |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
+| Create Events                           |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ✅      |       ❌       |   ❌   |    ❌     |
+| Manage Events                           |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ✅      |       ❌       |   ❌   |    ❌     |
+| **Advanced Permissions**                |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
+| Administrator                           |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 |                                         |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
 
 
