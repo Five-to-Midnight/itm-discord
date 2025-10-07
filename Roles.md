@@ -31,6 +31,13 @@
 | View Server Subscription Insights   |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | Manage Webhooks                     |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 | Manage Server                       |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| **Membership Permissions**          |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
+| Create Invite                       |      ✅      |       ❌        |     ❌     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Change Nickname                     |      ✅      |       ❌        |     ✅     |  −   |    ✅     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Manage Nicknames                    |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Kick, Approve, and Reject Members   |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Ban Members                         |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
+| Timeout Members                     |      ✅      |       ❌        |     ✅     |  ❌  |    ❌     |    ❌    |            ❌            |     ❌     |     ❌     |     ❌      |       ❌       |   ❌   |    ❌     |
 |                                     |              |                 |            |      |           |          |                          |            |            |             |                |        |           |
 
 
